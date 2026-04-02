@@ -1,0 +1,811 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双倍用心卡牌护理中心 - 宝可梦主题专业修复服务</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --pokemon-red: #FF3E3E;
+            --pokemon-blue: #3B4CCA;
+            --pokemon-yellow: #FFCB05;
+            --pokemon-dark: #2A3F8F;
+            --pokeball-white: #FFFFFF;
+            --gradient-primary: linear-gradient(135deg, #FF3E3E 0%, #3B4CCA 100%);
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: linear-gradient(180deg, #f5f7fa 0%, #e8ecf1 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* 头部导航 */
+        .header {
+            background: var(--gradient-primary);
+            padding: 20px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,203,5,0.1) 0%, transparent 70%);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-container {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .dual-heart-pokeball {
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+
+        .pokeball-circle {
+            width: 80px;
+            height: 80px;
+            border: 4px solid #333;
+            border-radius: 50%;
+            position: relative;
+            background: linear-gradient(180deg, #FF3E3E 50%, #FFFFFF 50%);
+        }
+
+        .pokeball-button {
+            width: 16px;
+            height: 16px;
+            background: white;
+            border: 3px solid #333;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+
+        .heart-left {
+            position: absolute;
+            top: 20%;
+            left: 25%;
+            width: 20px;
+            height: 20px;
+            background: #FF6B9D;
+            transform: rotate(-45deg);
+            border-radius: 5px 5px 0 0;
+        }
+
+        .heart-left::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10px;
+            width: 20px;
+            height: 20px;
+            background: #FF6B9D;
+            border-radius: 50%;
+        }
+
+        .heart-right {
+            position: absolute;
+            top: 20%;
+            right: 25%;
+            width: 20px;
+            height: 20px;
+            background: #FF6B9D;
+            transform: rotate(-45deg);
+            border-radius: 5px 5px 0 0;
+        }
+
+        .heart-right::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10px;
+            width: 20px;
+            height: 20px;
+            background: #FF6B9D;
+            border-radius: 50%;
+        }
+
+        .brand-name {
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .brand-tagline {
+            color: var(--pokemon-yellow);
+            font-size: 16px;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-menu a:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        /* 时间显示模块 */
+        .time-module {
+            background: white;
+            max-width: 1400px;
+            margin: -30px auto 30px;
+            padding: 25px 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .time-display {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .time-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .time-text {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--pokemon-dark);
+        }
+
+        .date-text {
+            font-size: 16px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* 主要内容区 */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px 60px;
+        }
+
+        /* 近期送修展示区 */
+        .showcase-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--pokemon-dark);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-title::before {
+            content: '⚡';
+            font-size: 36px;
+        }
+
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .showcase-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .showcase-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }
+
+        .showcase-image {
+            width: 100%;
+            height: 280px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .showcase-image::after {
+            content: '🃏';
+            position: absolute;
+            opacity: 0.3;
+            font-size: 150px;
+        }
+
+        .showcase-info {
+            padding: 25px;
+        }
+
+        .showcase-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .showcase-desc {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .showcase-status {
+            display: inline-block;
+            padding: 6px 15px;
+            background: var(--pokemon-yellow);
+            color: #333;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* 建档入口模块 */
+        .archive-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .archive-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .archive-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-primary);
+        }
+
+        .archive-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+        }
+
+        .archive-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .archive-title {
+            font-size: 26px;
+            font-weight: bold;
+            color: var(--pokemon-dark);
+            margin-bottom: 15px;
+        }
+
+        .archive-desc {
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+
+        .archive-btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: var(--gradient-primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255,62,62,0.3);
+        }
+
+        .archive-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255,62,62,0.4);
+        }
+
+        /* 拓展功能区 */
+        .expansion-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+        .expansion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .expansion-item {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .expansion-item:hover {
+            border-color: var(--pokemon-yellow);
+            background: linear-gradient(135deg, #fff9db 0%, #ffffff 100%);
+            transform: translateY(-5px);
+        }
+
+        .expansion-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .expansion-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .expansion-desc {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .coming-soon {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e9ecef;
+            color: #666;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        /* 页脚 */
+        .footer {
+            background: var(--pokemon-dark);
+            color: white;
+            padding: 40px 0;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            text-align: center;
+        }
+
+        .footer-slogan {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--pokemon-yellow);
+        }
+
+        .footer-text {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+
+        .pokemon-characters {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            font-size: 50px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+                padding: 0 20px;
+            }
+
+            .brand-name {
+                font-size: 24px;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+            }
+
+            .time-module {
+                margin: -20px 20px 20px;
+                padding: 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .main-content {
+                padding: 0 20px 40px;
+            }
+
+            .archive-section {
+                grid-template-columns: 1fr;
+            }
+
+            .showcase-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 宝可梦装饰元素 */
+        .pokemon-decoration {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 60px;
+            opacity: 0.8;
+            animation: bounce 2s ease-in-out infinite;
+            z-index: 100;
+            cursor: pointer;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部导航 -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-container">
+                    <img src="../generated_image_1774969048935.jpg" alt="双倍用心 Logo" class="logo-img">
+                </div>
+                <div>
+                    <div class="brand-name">双倍用心卡牌护理中心</div>
+                    <div class="brand-tagline">专业修复 · 全程透明 · 用心守护</div>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#showcase">案例展示</a></li>
+                <li><a href="#archive">卡牌建档</a></li>
+                <li><a href="#expansion">更多功能</a></li>
+                <li><a href="#contact">联系我们</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- 时间显示模块 -->
+    <div class="time-module">
+        <div class="time-display">
+            <div class="time-icon">🕐</div>
+            <div>
+                <div class="time-text" id="currentTime">加载中...</div>
+                <div class="date-text" id="currentDate">加载中...</div>
+            </div>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-size: 18px; font-weight: bold; color: var(--pokemon-dark);">营业时间</div>
+            <div style="color: #666; margin-top: 5px;">周一至周日 9:00 - 21:00</div>
+        </div>
+    </div>
+
+    <!-- 主要内容区 -->
+    <main class="main-content">
+        <!-- 近期送修展示区 -->
+        <section class="showcase-section" id="showcase">
+            <h2 class="section-title">近期送修案例</h2>
+            <div class="showcase-grid" id="showcaseGrid">
+                <!-- 案例卡片由 JS 动态渲染 -->
+            </div>
+        </section>
+
+        <!-- 卡牌建档入口 -->
+        <section class="archive-section" id="archive">
+            <!-- 管理员入口 -->
+            <div class="archive-card">
+                <div class="archive-icon">👨‍💼</div>
+                <h3 class="archive-title">管理员入口</h3>
+                <p class="archive-desc">
+                    管理员可直接创建、编辑、上传卡牌档案，支持 Word 格式导入导出。
+                    管理所有客户卡牌信息，更新维修进度，录入快递单号等。
+                </p>
+                <a href="admin_simple.html" class="archive-btn">进入管理后台</a>
+            </div>
+
+            <!-- 客户入口 -->
+            <div class="archive-card">
+                <div class="archive-icon">🎮</div>
+                <h3 class="archive-title">客户查询入口</h3>
+                <p class="archive-desc">
+                    客户可通过上传卡牌信息生成唯一验证号，凭验证码实时查看
+                    个人卡牌的修复进度、当前状态和预计完成时间。
+                </p>
+                <a href="query.html" class="archive-btn">查询我的卡牌</a>
+            </div>
+        </section>
+
+        <!-- 拓展功能区 -->
+        <section class="expansion-section" id="expansion">
+            <h2 class="section-title">更多功能</h2>
+            <div class="expansion-grid">
+                <div class="expansion-item">
+                    <div class="expansion-icon">📰</div>
+                    <h3 class="expansion-title">卡牌日报</h3>
+                    <p class="expansion-desc">每日推送宝可梦卡牌市场动态、收藏趋势和养护知识</p>
+                    <span class="coming-soon">即将上线</span>
+                </div>
+                <div class="expansion-item">
+                    <div class="expansion-icon">📊</div>
+                    <h3 class="expansion-title">价值评估</h3>
+                    <p class="expansion-desc">专业卡牌估值服务，了解您的卡牌收藏价值</p>
+                    <span class="coming-soon">即将上线</span>
+                </div>
+                <div class="expansion-item">
+                    <div class="expansion-icon">🎓</div>
+                    <h3 class="expansion-title">养护学院</h3>
+                    <p class="expansion-desc">学习卡牌保养技巧，成为专业的训练家</p>
+                    <span class="coming-soon">即将上线</span>
+                </div>
+                <div class="expansion-item">
+                    <div class="expansion-icon">💬</div>
+                    <h3 class="expansion-title">训练家社区</h3>
+                    <p class="expansion-desc">与其他收藏爱好者交流心得，分享收藏故事</p>
+                    <span class="coming-soon">即将上线</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer" id="contact">
+        <div class="footer-content">
+            <div class="footer-slogan">✨ 双倍用心呵护您的卡牌 ✨</div>
+            <p class="footer-text">
+                致每一位热爱宝可梦的训练家<br>
+                我们以专业技术和真诚服务，守护您的每一份热爱
+            </p>
+            <div class="pokemon-characters">
+                <span>⚡皮卡丘</span>
+                <span>🦊伊布</span>
+                <span>🔥小火龙</span>
+                <span>🐢杰尼龟</span>
+            </div>
+            <div style="margin-top: 30px; opacity: 0.7; font-size: 14px;">
+                © 2026 双倍用心卡牌护理中心 | 专业 · 透明 · 用心
+            </div>
+        </div>
+    </footer>
+
+    <!-- 宝可梦装饰吉祥物 -->
+    <div class="pokemon-decoration" title="欢迎来到双倍用心！">⚡</div>
+
+    <script>
+        // ========== 送修案例动态渲染 ==========
+        const DEFAULT_CASES = [
+            {
+                id: 'default-1',
+                title: '喷火龙 VMAX 卡牌修复',
+                description: '客户描述：卡牌边角严重磨损，表面有划痕和污渍。经过专业清洁、边角修复、表面抛光处理。',
+                status: '已完成',
+                bgGradient: 'linear-gradient(135deg, #FF6B6B 0%, #C44569 100%)',
+                emoji: '🔥'
+            },
+            {
+                id: 'default-2',
+                title: '皮卡丘 GX 卡牌翻新',
+                description: '客户描述：卡牌泛黄褪色，边缘开裂。采用专业去氧化技术，重新封装保护。',
+                status: '维修中',
+                bgGradient: 'linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%)',
+                emoji: '⚡'
+            },
+            {
+                id: 'default-3',
+                title: '伊布 evolusion 套装护理',
+                description: '客户描述：整套卡牌轻微弯曲，部分卡面有小气泡。进行平整处理和气泡排除。',
+                status: '已寄回',
+                bgGradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                emoji: '🦊'
+            }
+        ];
+
+        const STATUS_MAP = {
+            '已完成': { label: '✅ 已完成', color: '#48BB78' },
+            '维修中': { label: '🔧 维修中', color: '#ED8936' },
+            '已寄回': { label: '📦 已寄回', color: '#3B4CCA' },
+            '已接收': { label: '📥 已接收', color: '#718096' }
+        };
+
+        function renderShowcase() {
+            const grid = document.getElementById('showcaseGrid');
+            const saved = localStorage.getItem('showcaseCases');
+            const cases = (saved && JSON.parse(saved).length > 0) ? JSON.parse(saved) : DEFAULT_CASES;
+
+            grid.innerHTML = cases.map(c => {
+                const statusInfo = STATUS_MAP[c.status] || STATUS_MAP['已接收'];
+                const imgHtml = c.coverImage
+                    ? `<img src="${c.coverImage}" style="width:100%;height:100%;object-fit:cover;" alt="${c.title}">`
+                    : `<span style="font-size:72px;z-index:1;position:relative;">${c.emoji || '🃏'}</span>`;
+                return `
+                <div class="showcase-card">
+                    <div class="showcase-image" style="background:${c.bgGradient || 'linear-gradient(135deg,#667eea 0%,#764ba2 100%)'};display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+                        ${imgHtml}
+                        <span style="position:absolute;opacity:0.15;font-size:150px;">🃏</span>
+                    </div>
+                    <div class="showcase-info">
+                        <h3 class="showcase-title">${c.title}</h3>
+                        <p class="showcase-desc">${c.description}</p>
+                        <span class="showcase-status" style="background:${statusInfo.color};color:white;">${statusInfo.label}</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        renderShowcase();
+
+        // ========== 时间显示功能 ==========
+        function updateTime() {
+            const now = new Date();
+            const timeOptions = { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: false 
+            };
+            const dateOptions = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            };
+            
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('zh-CN', timeOptions);
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('zh-CN', dateOptions);
+        }
+
+        // 每秒更新时间
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId !== '#') {
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }
+            });
+        });
+
+        // 卡片悬停效果增强
+        document.querySelectorAll('.showcase-card, .archive-card, .expansion-item').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.zIndex = '10';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.zIndex = '1';
+            });
+        });
+    </script>
+</body>
+</html>

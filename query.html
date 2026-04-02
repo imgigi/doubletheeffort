@@ -1,0 +1,674 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>进度查询 - 双倍用心卡牌护理中心</title>
+    <style>
+        :root {
+            --pokemon-red: #FF3E3E;
+            --pokemon-blue: #3B4CCA;
+            --pokemon-yellow: #FFDE00;
+            --pokemon-dark: #2D3748;
+            --pokemon-light: #F7FAFC;
+            --success: #48BB78;
+            --warning: #ED8936;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, var(--pokemon-light) 0%, #E8F4F8 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--pokemon-red) 0%, var(--pokemon-blue) 100%);
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .query-box {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .query-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .query-header h2 {
+            color: var(--pokemon-dark);
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+
+        .query-header p {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--pokemon-dark);
+            font-size: 16px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #E2E8F0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--pokemon-blue);
+        }
+
+        .btn-query {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--pokemon-red) 0%, var(--pokemon-blue) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-query:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 76, 177, 0.4);
+        }
+
+        .result-section {
+            display: none;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #E2E8F0;
+        }
+
+        .result-card {
+            background: var(--pokemon-light);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .result-card h3 {
+            color: var(--pokemon-blue);
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .info-item .label {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+
+        .info-item .value {
+            font-size: 16px;
+            color: var(--pokemon-dark);
+            font-weight: bold;
+        }
+
+        .damage-desc {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .damage-desc .label {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+
+        .damage-desc .value {
+            font-size: 14px;
+            color: var(--pokemon-dark);
+            line-height: 1.6;
+        }
+
+        .progress-timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 30px;
+            bottom: -20px;
+            width: 2px;
+            background: #E2E8F0;
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+        .timeline-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #E2E8F0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+            font-size: 16px;
+        }
+
+        .timeline-item.active .timeline-icon {
+            background: var(--success);
+            color: white;
+        }
+
+        .timeline-item.current .timeline-icon {
+            background: var(--warning);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--pokemon-dark);
+            margin-bottom: 5px;
+        }
+
+        .timeline-date {
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .status-received {
+            background: #BEE3F8;
+            color: #2C5282;
+        }
+
+        .status-repairing {
+            background: #FEFCBF;
+            color: #975A16;
+        }
+
+        .status-completed {
+            background: #C6F6D5;
+            color: #22543D;
+        }
+
+        .status-shipped {
+            background: #FED7E2;
+            color: #831843;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            color: var(--pokemon-blue);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #E6FFFA 0%, #B2F5EA 100%);
+            border-left: 5px solid #38B2AC;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .tip-box p {
+            color: #2C7A7B;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .photo-gallery {
+            margin-top: 20px;
+        }
+
+        .photo-gallery h4 {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--pokemon-dark);
+            margin-bottom: 15px;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .photo-item {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .photo-item:hover {
+            transform: scale(1.05);
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-item .photo-name {
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 灯箱效果 */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>🎴 双倍用心卡牌护理中心</h1>
+        <p>专业修复 · 全程透明 · 用心守护</p>
+    </header>
+
+    <div class="main-container">
+        <div class="query-box">
+            <!-- 查询表单 -->
+            <div id="queryForm">
+                <div class="query-header">
+                    <h2>查询您的卡牌修复进度</h2>
+                    <p>输入验证号，实时查看卡牌状态</p>
+                </div>
+                
+                <form id="searchForm">
+                    <div class="form-group">
+                        <label for="verificationCode">验证号</label>
+                        <input type="text" id="verificationCode" placeholder="请输入您的验证号（如：PKMNXXXXX）" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-query">🔍 立即查询</button>
+                </form>
+
+                <div class="tip-box">
+                    <p><strong>💡 温馨提示：</strong></p>
+                    <p>验证号由管理员提供，格式为 PKMN 开头的一串字符。如果您还没有验证号，请联系双倍用心卡牌护理中心获取。</p>
+                </div>
+            </div>
+
+            <!-- 查询结果 -->
+            <div class="result-section" id="resultSection">
+                <div class="result-card">
+                    <h3>📋 档案信息</h3>
+                    
+                    <span class="status-badge" id="resultStatus">维修中</span>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="label">卡牌名称</div>
+                            <div class="value" id="resultCardName">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">客户姓名</div>
+                            <div class="value" id="resultCustomerName">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">寄送时间</div>
+                            <div class="value" id="resultSendDate">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">接收时间</div>
+                            <div class="value" id="resultReceiveDate">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">完成时间</div>
+                            <div class="value" id="resultCompleteDate">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">发回时间</div>
+                            <div class="value" id="resultShipDate">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">快递单号</div>
+                            <div class="value" id="resultExpressNo">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">验证号</div>
+                            <div class="value" id="resultVerificationCode">-</div>
+                        </div>
+                    </div>
+
+                    <div class="damage-desc">
+                        <div class="label">损伤问题描述</div>
+                        <div class="value" id="resultDamageDesc">-</div>
+                    </div>
+
+                    <!-- 损伤照片展示 -->
+                    <div class="photo-gallery" id="photoGallery" style="display: none;">
+                        <h4>📸 损伤照片</h4>
+                        <div class="photo-grid" id="photoGrid"></div>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <h3>⏱️ 修复进度</h3>
+                    <div class="progress-timeline" id="progressTimeline">
+                        <!-- 动态生成进度条 -->
+                    </div>
+                </div>
+
+                <a href="#" class="back-btn" onclick="backToSearch()">← 返回继续查询</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 从 localStorage 读取数据（与 admin.html 共享数据）
+        function getArchives() {
+            return JSON.parse(localStorage.getItem('pokemonArchives') || '[]');
+        }
+
+        // 查询表单提交
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const code = document.getElementById('verificationCode').value.trim().toUpperCase();
+            const archives = getArchives();
+            
+            const archive = archives.find(a => a.verificationCode === code);
+            
+            if (archive) {
+                showResult(archive);
+            } else {
+                alert('❌ 未找到该验证号的档案信息\n\n请检查验证号是否正确，或联系管理员获取帮助。');
+            }
+        });
+
+        // 显示查询结果
+        function showResult(archive) {
+            document.getElementById('queryForm').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+            
+            // 填充基本信息
+            document.getElementById('resultStatus').textContent = archive.status;
+            document.getElementById('resultStatus').className = 'status-badge status-' + getStatusClass(archive.status);
+            document.getElementById('resultCardName').textContent = archive.cardName;
+            document.getElementById('resultCustomerName').textContent = archive.customerName;
+            document.getElementById('resultSendDate').textContent = archive.sendDate || '-';
+            document.getElementById('resultReceiveDate').textContent = archive.receiveDate || '-';
+            document.getElementById('resultCompleteDate').textContent = archive.completeDate || '-';
+            document.getElementById('resultShipDate').textContent = archive.shipDate || '-';
+            document.getElementById('resultExpressNo').textContent = archive.expressNo || '-';
+            document.getElementById('resultVerificationCode').textContent = archive.verificationCode;
+            document.getElementById('resultDamageDesc').textContent = archive.damageDesc || '-';
+            
+            // 显示损伤照片
+            if (archive.photos && archive.photos.length > 0) {
+                const photoGallery = document.getElementById('photoGallery');
+                const photoGrid = document.getElementById('photoGrid');
+                photoGallery.style.display = 'block';
+                photoGrid.innerHTML = '';
+                
+                archive.photos.forEach((photo, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'photo-item';
+                    item.onclick = function() { openLightbox(photo.data); };
+                    item.innerHTML = `
+                        <img src="${photo.data}" alt="${photo.name}">
+                        <div class="photo-name">${photo.name}</div>
+                    `;
+                    photoGrid.appendChild(item);
+                });
+            } else {
+                document.getElementById('photoGallery').style.display = 'none';
+            }
+            
+            // 生成进度时间轴
+            renderTimeline(archive);
+        }
+
+        // 打开灯箱
+        function openLightbox(imgSrc) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightboxImg');
+            lightbox.style.display = 'flex';
+            lightboxImg.src = imgSrc;
+        }
+
+        // 关闭灯箱
+        function closeLightbox() {
+            document.getElementById('lightbox').style.display = 'none';
+        }
+
+        // 获取状态样式类
+        function getStatusClass(status) {
+            const map = {
+                '已接收': 'received',
+                '维修中': 'repairing',
+                '已完成': 'completed',
+                '已寄回': 'shipped'
+            };
+            return map[status] || 'received';
+        }
+
+        // 渲染进度时间轴
+        function renderTimeline(archive) {
+            const timeline = document.getElementById('progressTimeline');
+            timeline.innerHTML = '';
+            
+            const steps = [
+                {
+                    status: '已接收',
+                    icon: '📦',
+                    title: '卡牌已接收',
+                    date: archive.sendDate,
+                    desc: '我们已收到您寄送的卡牌'
+                },
+                {
+                    status: '已接收',
+                    icon: '✓',
+                    title: '建档完成',
+                    date: archive.receiveDate,
+                    desc: '卡牌信息已录入系统'
+                },
+                {
+                    status: '维修中',
+                    icon: '🔧',
+                    title: '开始修复',
+                    date: archive.receiveDate,
+                    desc: '专业技术人员进行卡牌修复'
+                },
+                {
+                    status: '已完成',
+                    icon: '✨',
+                    title: '修复完成',
+                    date: archive.completeDate,
+                    desc: '卡牌修复完成，等待寄回'
+                },
+                {
+                    status: '已寄回',
+                    icon: '📮',
+                    title: '已寄回客户',
+                    date: archive.shipDate,
+                    desc: '卡牌已通过快递寄回给您'
+                }
+            ];
+            
+            const currentStatusIndex = Object.keys({
+                '已接收': 0,
+                '维修中': 1,
+                '已完成': 2,
+                '已寄回': 3
+            }).indexOf(archive.status);
+            
+            steps.forEach((step, index) => {
+                const item = document.createElement('div');
+                let className = 'timeline-item';
+                
+                if (index <= currentStatusIndex) {
+                    className += ' active';
+                }
+                if (index === currentStatusIndex) {
+                    className += ' current';
+                }
+                
+                item.className = className;
+                item.innerHTML = `
+                    <div class="timeline-icon">${step.icon}</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">${step.title}</div>
+                        <div class="timeline-date">${step.date || '待处理'} - ${step.desc}</div>
+                    </div>
+                `;
+                
+                timeline.appendChild(item);
+            });
+        }
+
+        // 返回查询
+        function backToSearch() {
+            document.getElementById('queryForm').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('searchForm').reset();
+        }
+    </script>
+
+    <!-- 灯箱 -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightboxImg" src="" alt="放大预览">
+    </div>
+</body>
+</html>
