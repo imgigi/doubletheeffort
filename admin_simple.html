@@ -153,12 +153,38 @@
         .password-info-box p { font-size: 14px; opacity: 0.9; line-height: 1.6; }
         .password-info-box .btn-secondary { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; transition: background 0.3s; }
         .password-info-box .btn-secondary:hover { background: rgba(255,255,255,0.3); }
+        
+        /* 照片裁剪器样式 */
+        .crop-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 3000; align-items: center; justify-content: center; }
+        .crop-modal.active { display: flex; }
+        .crop-container { background: white; border-radius: 20px; padding: 30px; max-width: 900px; width: 90%; max-height: 90vh; overflow: hidden; }
+        .crop-title { font-size: 20px; font-weight: bold; color: var(--pokemon-dark); margin-bottom: 20px; text-align: center; }
+        .crop-workspace { position: relative; width: 100%; height: 500px; background: #1a202c; border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .crop-image { position: absolute; max-width: none; cursor: move; user-select: none; }
+        .crop-frame { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 400px; height: 225px; border: 3px dashed var(--pokemon-yellow); box-shadow: 0 0 0 9999px rgba(0,0,0,0.7); pointer-events: none; z-index: 10; }
+        .crop-frame::before { content: '16:9'; position: absolute; top: -25px; left: 50%; transform: translateX(-50%); color: var(--pokemon-yellow); font-size: 12px; font-weight: bold; background: rgba(0,0,0,0.7); padding: 3px 10px; border-radius: 10px; }
+        .crop-grid-line { position: absolute; background: rgba(255,203,5,0.3); pointer-events: none; }
+        .crop-grid-v { width: 1px; height: 100%; }
+        .crop-grid-h { height: 1px; width: 100%; }
+        .crop-controls { display: flex; gap: 15px; justify-content: center; align-items: center; flex-wrap: wrap; }
+        .crop-btn { padding: 12px 25px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 14px; }
+        .crop-btn-primary { background: var(--pokemon-blue); color: white; }
+        .crop-btn-primary:hover { background: #2C3AA0; }
+        .crop-btn-cancel { background: #A0AEC0; color: white; }
+        .crop-btn-cancel:hover { background: #718096; }
+        .crop-zoom-slider { display: flex; align-items: center; gap: 10px; }
+        .crop-zoom-slider input[type="range"] { width: 200px; height: 6px; -webkit-appearance: none; background: #E2E8F0; border-radius: 3px; outline: none; }
+        .crop-zoom-slider input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--pokemon-blue); border-radius: 50%; cursor: pointer; }
+        .crop-tip { text-align: center; color: #718096; font-size: 13px; margin-top: 15px; }
     </style>
 </head>
 <body>
     <!-- 登录界面 -->
     <div class="login-container" id="loginPage">
         <div class="login-box">
+            <div style="text-align:right;margin-bottom:10px;">
+                <a href="index.html" style="color:#718096;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.color='#3B4CCA'" onmouseout="this.style.color='#718096'">🏠 返回首页</a>
+            </div>
             <div class="login-header">
                 <h1>🎴 管理员登录</h1>
                 <p>双倍用心卡牌护理中心</p>
@@ -186,7 +212,7 @@
         <nav class="top-nav">
             <div class="brand">⚡ 双倍用心卡牌护理中心</div>
             <div class="user-info">
-                <span>欢迎，管理员</span>
+                <a href="index.html" style="background:rgba(255,255,255,0.2);color:white;padding:8px 20px;border-radius:20px;text-decoration:none;font-size:14px;display:flex;align-items:center;gap:6px;transition:background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">🏠 返回首页</a>
                 <span class="settings-btn" onclick="openSettingsPanel()">⚙️ 设置</span>
                 <span class="logout-btn" onclick="logout()">退出登录</span>
             </div>
@@ -314,9 +340,9 @@
                 <h2>🔓 忘记密码找回</h2>
             </div>
             <div class="security-hint-box" style="background:linear-gradient(135deg,#F56565 0%,#C53030 100%);">
-                <h4>⚠️ 重要：通过安全提示找回密码</h4>
+                <h4>⚠️ 安全验证</h4>
                 <p>请输入安全提示答案以验证身份，验证成功后可直接设置新密码。</p>
-                <p style="font-size:14px;color:#718096;margin-top:8px;">提示：安全提示是关于什么内容的？（答案："张鹏翔"）</p>
+                <p style="font-size:13px;color:#FFD7D7;margin-top:10px;">💡 提示：您设置的安全提示是关于什么内容的？</p>
             </div>
             <form id="forgotPasswordForm">
                 <div class="form-group">
@@ -346,6 +372,32 @@
 
     <!-- 遮罩层 -->
     <div class="overlay" id="overlay" onclick="closeSettingsPanel()"></div>
+    
+    <!-- 照片裁剪器弹窗 -->
+    <div class="crop-modal" id="cropModal">
+        <div class="crop-container">
+            <div class="crop-title">📐 调整照片裁剪区域（16:9）</div>
+            <div class="crop-workspace" id="cropWorkspace">
+                <img id="cropImage" class="crop-image" src="" alt="待裁剪图片">
+                <div class="crop-frame" id="cropFrame">
+                    <div class="crop-grid-line crop-grid-v" style="left: 33.33%;"></div>
+                    <div class="crop-grid-line crop-grid-v" style="left: 66.66%;"></div>
+                    <div class="crop-grid-line crop-grid-h" style="top: 33.33%;"></div>
+                    <div class="crop-grid-line crop-grid-h" style="top: 66.66%;"></div>
+                </div>
+            </div>
+            <div class="crop-controls">
+                <button type="button" class="crop-btn crop-btn-cancel" onclick="cancelCrop()">取消</button>
+                <div class="crop-zoom-slider">
+                    <span style="font-size:13px;color:#4A5568;">缩放：</span>
+                    <input type="range" id="cropZoomSlider" min="0.1" max="3" step="0.05" value="1" oninput="updateCropZoom()">
+                </div>
+                <button type="button" class="crop-btn crop-btn-primary" onclick="confirmCrop()">✅ 确认裁剪</button>
+            </div>
+            <div class="crop-tip">💡 提示：拖动图片调整位置，使用滑块缩放图片，黄色虚线框内为最终显示区域</div>
+        </div>
+    </div>
+    
     <!-- 新建/编辑档案弹窗 -->
     <div class="modal" id="archiveModal">
         <div class="modal-content">
@@ -479,41 +531,107 @@
         
         // 页面加载时检查登录状态
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('====== 双倍用心管理员后台启动 ======');
+            console.log('默认密码:', DEFAULT_PASSWORD);
+            console.log('LocalStorage 存储的密码:', localStorage.getItem('adminPassword'));
+            
             const savedLogin = sessionStorage.getItem('simpleAdminLoggedIn');
-            if (savedLogin === 'true') {
-                showDashboard();
+            console.log('SessionStorage 登录状态:', savedLogin);
+            
+            // 确保 DOM 元素存在
+            const loginPage = document.getElementById('loginPage');
+            const adminDashboard = document.getElementById('adminDashboard');
+            
+            if (!loginPage || !adminDashboard) {
+                console.error('错误：找不到关键的 DOM 元素！');
+                alert('页面加载异常，请刷新页面重试');
+                return;
             }
-            renderTable();
-            updateStats();
-            renderColorPicker();
+            
+            if (savedLogin === 'true') {
+                console.log('已登录，显示管理后台');
+                showDashboard();
+            } else {
+                console.log('未登录，显示登录页面');
+                // 确保初始状态正确
+                loginPage.style.display = 'flex';
+                adminDashboard.style.display = 'none';
+            }
+            
+            // 延迟执行数据渲染，确保 DOM 完全就绪
+            setTimeout(function() {
+                renderTable();
+                updateStats();
+                renderColorPicker();
+            }, 100);
         });
         
         // 登录表单提交
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            
-            if (username === ADMIN_USERNAME && password === getCurrentPassword()) {
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const usernameInput = document.getElementById('username');
+                const passwordInput = document.getElementById('password');
+                
+                if (!usernameInput || !passwordInput) {
+                    alert('表单元素加载失败，请刷新页面');
+                    return;
+                }
+                
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value.trim();
+                
+                console.log('====== 尝试登录 ======');
+                console.log('输入用户名:', username);
+                console.log('输入密码:', password);
+                console.log('期望用户名:', ADMIN_USERNAME);
+                console.log('期望密码:', getCurrentPassword());
+                
+                if (username !== ADMIN_USERNAME) {
+                    alert('❌ 用户名错误！\n\n默认用户名是：admin');
+                    return;
+                }
+                
+                const currentPwd = getCurrentPassword();
+                if (password !== currentPwd) {
+                    console.log('密码不匹配 - 输入:', password, '期望:', currentPwd);
+                    alert('❌ 密码错误！\n\n如果忘记密码，请点击下方的"忘记密码？"链接重置密码。\n\n默认密码是：zpx8495168');
+                    return;
+                }
+                
+                // 登录成功
                 sessionStorage.setItem('simpleAdminLoggedIn', 'true');
                 isLoggedIn = true;
+                console.log('✅ 登录成功，保存 session');
                 showDashboard();
-                alert('✅ 登录成功！');
-            } else {
-                alert('❌ 用户名或密码错误！');
-            }
-        });
+                
+                // 延迟显示成功提示，让用户看到界面切换
+                setTimeout(function() {
+                    alert('✅ 登录成功！欢迎使用双倍用心卡牌护理中心管理系统');
+                }, 300);
+            });
+        }
         
         // 显示管理后台
         function showDashboard() {
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('adminDashboard').style.display = 'block';
+            const loginPage = document.getElementById('loginPage');
+            const adminDashboard = document.getElementById('adminDashboard');
+            
+            if (loginPage && adminDashboard) {
+                loginPage.style.display = 'none';
+                adminDashboard.style.display = 'block';
+                console.log('管理后台已显示');
+            } else {
+                console.error('showDashboard: 找不到 DOM 元素');
+            }
         }
         
         // 退出登录
         function logout() {
             if (confirm('确定要退出登录吗？')) {
                 sessionStorage.removeItem('simpleAdminLoggedIn');
+                isLoggedIn = false;
                 location.reload();
             }
         }
@@ -720,25 +838,220 @@
             });
         }
         
+        // 当前正在处理的照片数组和回调
+        let currentCropFile = null;
+        let currentCropCallback = null;
+        let cropImageObj = null;
+        let cropScale = 1;
+        let cropPosX = 0;
+        let cropPosY = 0;
+        let isDragging = false;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
+        
         function toggleCropHint() {
             const enabled = document.getElementById('enableCrop16_9').checked;
             document.getElementById('cropHint').textContent = enabled ? '✓ 上传的图片将自动裁剪为 16:9 比例' : '○ 保持原始图片比例';
         }
         
+        // 打开裁剪器
+        function openCropModal(file, callback) {
+            currentCropFile = file;
+            currentCropCallback = callback;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('cropImage');
+                img.src = e.target.result;
+                img.onload = function() {
+                    // 初始化裁剪器
+                    initCropImage();
+                    document.getElementById('cropModal').classList.add('active');
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // 初始化裁剪图片位置
+        function initCropImage() {
+            const img = document.getElementById('cropImage');
+            const workspace = document.getElementById('cropWorkspace');
+            const frame = document.getElementById('cropFrame');
+            
+            // 重置缩放和位置
+            cropScale = 1;
+            document.getElementById('cropZoomSlider').value = 1;
+            
+            // 计算图片初始位置（居中）
+            const workspaceRect = workspace.getBoundingClientRect();
+            const frameRect = frame.getBoundingClientRect();
+            
+            // 图片加载完成后设置初始位置
+            setTimeout(function() {
+                const imgRect = img.getBoundingClientRect();
+                cropPosX = (workspaceRect.width - imgRect.width) / 2;
+                cropPosY = (workspaceRect.height - imgRect.height) / 2;
+                updateCropImageTransform();
+            }, 100);
+        }
+        
+        // 更新裁剪图片变换
+        function updateCropImageTransform() {
+            const img = document.getElementById('cropImage');
+            img.style.transform = `translate(${cropPosX}px, ${cropPosY}px) scale(${cropScale})`;
+            img.style.transformOrigin = 'center center';
+        }
+        
+        // 更新缩放
+        function updateCropZoom() {
+            cropScale = parseFloat(document.getElementById('cropZoomSlider').value);
+            updateCropImageTransform();
+        }
+        
+        // 取消裁剪
+        function cancelCrop() {
+            document.getElementById('cropModal').classList.remove('active');
+            currentCropFile = null;
+            currentCropCallback = null;
+        }
+        
+        // 确认裁剪
+        function confirmCrop() {
+            if (!currentCropFile || !currentCropCallback) return;
+            
+            const img = document.getElementById('cropImage');
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 16:9 输出尺寸
+            const outputWidth = 1600;
+            const outputHeight = 900;
+            canvas.width = outputWidth;
+            canvas.height = outputHeight;
+            
+            // 获取裁剪框相对于工作区的位置
+            const workspace = document.getElementById('cropWorkspace');
+            const frame = document.getElementById('cropFrame');
+            const workspaceRect = workspace.getBoundingClientRect();
+            const frameRect = frame.getBoundingClientRect();
+            
+            // 计算裁剪区域在原始图片上的映射
+            const scaleX = img.naturalWidth / (frameRect.width / cropScale);
+            const scaleY = img.naturalHeight / (frameRect.height / cropScale);
+            
+            // 图片中心点
+            const imgCenterX = workspaceRect.width / 2;
+            const imgCenterY = workspaceRect.height / 2;
+            
+            // 裁剪框中心点（相对于工作区）
+            const frameCenterX = frameRect.left - workspaceRect.left + frameRect.width / 2;
+            const frameCenterY = frameRect.top - workspaceRect.top + frameRect.height / 2;
+            
+            // 计算偏移
+            const offsetX = (frameCenterX - imgCenterX - cropPosX) * scaleX;
+            const offsetY = (frameCenterY - imgCenterY - cropPosY) * scaleY;
+            
+            // 绘制裁剪后的图片
+            const sourceWidth = frameRect.width / cropScale;
+            const sourceHeight = frameRect.height / cropScale;
+            const sourceX = (img.naturalWidth - sourceWidth) / 2 + offsetX;
+            const sourceY = (img.naturalHeight - sourceHeight) / 2 + offsetY;
+            
+            ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, outputWidth, outputHeight);
+            
+            // 转换为 base64
+            const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+            
+            // 调用回调
+            currentCropCallback(croppedDataUrl);
+            
+            // 关闭裁剪器
+            document.getElementById('cropModal').classList.remove('active');
+            currentCropFile = null;
+            currentCropCallback = null;
+        }
+        
+        // 鼠标拖拽事件
+        function setupCropDrag() {
+            const workspace = document.getElementById('cropWorkspace');
+            const img = document.getElementById('cropImage');
+            
+            workspace.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+                img.style.cursor = 'grabbing';
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                const deltaX = e.clientX - lastMouseX;
+                const deltaY = e.clientY - lastMouseY;
+                cropPosX += deltaX;
+                cropPosY += deltaY;
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+                updateCropImageTransform();
+            });
+            
+            document.addEventListener('mouseup', function() {
+                isDragging = false;
+                img.style.cursor = 'move';
+            });
+            
+            // 触摸支持
+            workspace.addEventListener('touchstart', function(e) {
+                isDragging = true;
+                lastMouseX = e.touches[0].clientX;
+                lastMouseY = e.touches[0].clientY;
+            });
+            
+            document.addEventListener('touchmove', function(e) {
+                if (!isDragging) return;
+                const deltaX = e.touches[0].clientX - lastMouseX;
+                const deltaY = e.touches[0].clientY - lastMouseY;
+                cropPosX += deltaX;
+                cropPosY += deltaY;
+                lastMouseX = e.touches[0].clientX;
+                lastMouseY = e.touches[0].clientY;
+                updateCropImageTransform();
+            });
+            
+            document.addEventListener('touchend', function() {
+                isDragging = false;
+            });
+        }
+        
+        // 页面加载时设置拖拽
+        document.addEventListener('DOMContentLoaded', function() {
+            setupCropDrag();
+        });
+        
         async function handlePhotoSelect(event) {
             const files = event.target.files;
+            const enableCrop = document.getElementById('enableCrop16_9')?.checked || false;
+            
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 if (file.size > 300 * 1024 * 1024) {
                     alert(`${file.name} 超过 300MB，已跳过`);
                     continue;
                 }
-                try {
-                    const compressed = await compressImage(file, document.getElementById('enableCrop16_9')?.checked || false);
-                    currentPhotos.push(compressed);
-                    renderPhotoPreview();
-                } catch (err) {
-                    alert(`${file.name} 处理失败：${err.message}`);
+                
+                if (enableCrop) {
+                    // 打开可视化裁剪器
+                    openCropModal(file, function(croppedDataUrl) {
+                        currentPhotos.push(croppedDataUrl);
+                        renderPhotoPreview();
+                    });
+                } else {
+                    try {
+                        const compressed = await compressImage(file, false);
+                        currentPhotos.push(compressed);
+                        renderPhotoPreview();
+                    } catch (err) {
+                        alert(`${file.name} 处理失败：${err.message}`);
+                    }
                 }
             }
             event.target.value = '';

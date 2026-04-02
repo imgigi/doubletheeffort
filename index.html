@@ -178,6 +178,7 @@
             display: flex;
             gap: 30px;
             list-style: none;
+            align-items: center;
         }
 
         .nav-menu a {
@@ -193,6 +194,21 @@
         .nav-menu a:hover {
             background: rgba(255,255,255,0.2);
             transform: translateY(-2px);
+        }
+        
+        /* 管理员登录按钮 */
+        .admin-login-btn {
+            background: rgba(255,255,255,0.25) !important;
+            border: 2px solid rgba(255,255,255,0.5);
+            font-weight: 600 !important;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .admin-login-btn:hover {
+            background: rgba(255,203,5,0.3) !important;
+            border-color: var(--pokemon-yellow) !important;
         }
 
         /* 时间显示模块 */
@@ -292,7 +308,8 @@
 
         .showcase-image {
             width: 100%;
-            height: 280px;
+            height: 0;
+            padding-bottom: 56.25%; /* 16:9 比例 */
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
@@ -571,7 +588,7 @@
         <div class="header-content">
             <div class="logo-section">
                 <div class="logo-container">
-                    <img src="../generated_image_1774969048935.jpg" alt="双倍用心 Logo" class="logo-img">
+                    <img src="../品牌LOGO/1dd4e694-218d-4f00-ba30-9d4663ed8617.jpg" alt="双倍用心 Logo" class="logo-img">
                 </div>
                 <div>
                     <div class="brand-name">双倍用心卡牌护理中心</div>
@@ -583,6 +600,7 @@
                 <li><a href="#archive">卡牌建档</a></li>
                 <li><a href="#expansion">更多功能</a></li>
                 <li><a href="#contact">联系我们</a></li>
+                <li><a href="admin_simple.html" class="admin-login-btn" title="管理员登录">🔑 管理员登录</a></li>
             </ul>
         </div>
     </header>
@@ -694,33 +712,6 @@
 
     <script>
         // ========== 送修案例动态渲染 ==========
-        const DEFAULT_CASES = [
-            {
-                id: 'default-1',
-                title: '喷火龙 VMAX 卡牌修复',
-                description: '客户描述：卡牌边角严重磨损，表面有划痕和污渍。经过专业清洁、边角修复、表面抛光处理。',
-                status: '已完成',
-                bgGradient: 'linear-gradient(135deg, #FF6B6B 0%, #C44569 100%)',
-                emoji: '🔥'
-            },
-            {
-                id: 'default-2',
-                title: '皮卡丘 GX 卡牌翻新',
-                description: '客户描述：卡牌泛黄褪色，边缘开裂。采用专业去氧化技术，重新封装保护。',
-                status: '维修中',
-                bgGradient: 'linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%)',
-                emoji: '⚡'
-            },
-            {
-                id: 'default-3',
-                title: '伊布 evolusion 套装护理',
-                description: '客户描述：整套卡牌轻微弯曲，部分卡面有小气泡。进行平整处理和气泡排除。',
-                status: '已寄回',
-                bgGradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                emoji: '🦊'
-            }
-        ];
-
         const STATUS_MAP = {
             '已完成': { label: '✅ 已完成', color: '#48BB78' },
             '维修中': { label: '🔧 维修中', color: '#ED8936' },
@@ -731,26 +722,45 @@
         function renderShowcase() {
             const grid = document.getElementById('showcaseGrid');
             const saved = localStorage.getItem('showcaseCases');
-            const cases = (saved && JSON.parse(saved).length > 0) ? JSON.parse(saved) : DEFAULT_CASES;
+            const cases = saved ? JSON.parse(saved) : [];
+
+            if (cases.length === 0) {
+                // 没有上传案例时显示友好提示
+                grid.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: #999;">
+                    <div style="font-size: 64px; margin-bottom: 20px;">📤</div>
+                    <div style="font-size: 18px; font-weight: bold; color: #666; margin-bottom: 10px;">暂无案例展示</div>
+                    <div style="font-size: 14px;">管理员在后台上传真实送修案例后，会在这里展示</div>
+                    <a href="admin_simple.html" style="display: inline-block; margin-top: 20px; padding: 12px 30px; background: linear-gradient(135deg, #FF3E3E 0%, #3B4CCA 100%); color: white; text-decoration: none; border-radius: 25px; font-size: 14px; font-weight: 600;">去上传案例</a>
+                </div>`;
+                return;
+            }
 
             grid.innerHTML = cases.map(c => {
-                const statusInfo = STATUS_MAP[c.status] || STATUS_MAP['已接收'];
-                const imgHtml = c.coverImage
-                    ? `<img src="${c.coverImage}" style="width:100%;height:100%;object-fit:cover;" alt="${c.title}">`
-                    : `<span style="font-size:72px;z-index:1;position:relative;">${c.emoji || '🃏'}</span>`;
+                const statusInfo = STATUS_MAP[c.status] || STATUS_MAP['已完成'];
+                // 使用第一张照片作为封面图
+                const coverImage = c.photos && c.photos.length > 0 ? c.photos[0] : null;
                 return `
                 <div class="showcase-card">
-                    <div class="showcase-image" style="background:${c.bgGradient || 'linear-gradient(135deg,#667eea 0%,#764ba2 100%)'};display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
-                        ${imgHtml}
-                        <span style="position:absolute;opacity:0.15;font-size:150px;">🃏</span>
+                    <div class="showcase-image" style="background:${c.gradient || 'linear-gradient(135deg,#667eea 0%,#764ba2 100%)'};position:relative;">
+                        ${coverImage ? `<img src="${coverImage}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" alt="${escapeHtml(c.title)}">` : `<span style="font-size:72px;z-index:1;position:relative;">🃏</span>`}
+                        <span style="position:absolute;opacity:0.15;font-size:150px;pointer-events:none;">🃏</span>
                     </div>
                     <div class="showcase-info">
-                        <h3 class="showcase-title">${c.title}</h3>
-                        <p class="showcase-desc">${c.description}</p>
+                        <h3 class="showcase-title">${escapeHtml(c.title)}</h3>
+                        <p class="showcase-desc">${escapeHtml(c.description)}</p>
                         <span class="showcase-status" style="background:${statusInfo.color};color:white;">${statusInfo.label}</span>
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        // HTML 转义防止 XSS
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         renderShowcase();
